@@ -35,7 +35,7 @@ app.get('/', (req, res) => {
 
 // Example of a route module
 import exampleRoutes from './src/routes/routes.js';
-app.use('/api/example', exampleRoutes);
+app.use('/api/users', exampleRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
