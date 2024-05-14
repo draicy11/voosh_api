@@ -5,6 +5,8 @@ import morgan from 'morgan';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import session from 'express-session';
+import passport from './src/config/passport.js';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -17,6 +19,18 @@ app.use(bodyParser.json()); // Parse JSON bodies
 app.use(bodyParser.urlencoded({ extended: true })); // Parse URL-encoded bodies
 app.use(morgan('dev')); // Log requests to the console
 app.use(cors()); // Enable CORS
+
+// Express session middleware
+app.use(session({
+    secret: process.env.SESSION_SECRET, // Change this to a random string (can be generated using a tool like `uuid`)
+    resave: false,
+    saveUninitialized: false
+}));
+
+// Initialize Passport.js
+app.use(passport.initialize());
+app.use(passport.session()); 
+
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {})
@@ -34,13 +48,13 @@ app.get('/', (req, res) => {
 });
 
 // Example of a route module
-import exampleRoutes from './src/routes/routes.js';
-app.use('/api/users', exampleRoutes);
+import routes from './src/routes/routes.js';
+app.use('/api/users', routes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).json({ message: 'Something went wrong!' });
+    res.status(500).json({ message: 'Something went wrong! - ' + err });
 });
 
 // Set the port
