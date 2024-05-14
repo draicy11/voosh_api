@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import morgan from 'morgan';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import mongoose from 'mongoose';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -16,6 +17,16 @@ app.use(bodyParser.json()); // Parse JSON bodies
 app.use(bodyParser.urlencoded({ extended: true })); // Parse URL-encoded bodies
 app.use(morgan('dev')); // Log requests to the console
 app.use(cors()); // Enable CORS
+
+// Connect to MongoDB
+mongoose.connect(process.env.MONGO_URI, {})
+.then(() => {
+    console.log('Connected to MongoDB');
+})
+.catch((error) => {
+    console.error('Error connecting to MongoDB:', error.message);
+});
+
 
 // Basic route
 app.get('/', (req, res) => {
