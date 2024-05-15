@@ -38,7 +38,8 @@ passport.use(new GoogleStrategy({
 }, async (accessToken, refreshToken, profile, done) => {
     try {
         // Check if the user already exists
-        let user = await User.findOne({ googleId: profile.id });
+        let user = await User.findOne({ $or: [{ googleId: profile.id }, { email: profile.emails[0].value }] });
+        
         if (user) {
             return done(null, user);
         }

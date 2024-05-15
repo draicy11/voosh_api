@@ -42,7 +42,7 @@ mongoose.connect(process.env.MONGO_URI, {})
 
 
 // Test route
-app.get('/', (req, res) => {
+app.get('/api', (req, res) => {
     res.json({ message: 'Welcome to the API!' });
 });
 
