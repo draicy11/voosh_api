@@ -1,4 +1,3 @@
-// Import required modules
 import express from 'express';
 import bodyParser from 'body-parser';
 import morgan from 'morgan';
@@ -42,14 +41,18 @@ mongoose.connect(process.env.MONGO_URI, {})
 });
 
 
-// Basic route
+// Test route
 app.get('/', (req, res) => {
     res.json({ message: 'Welcome to the API!' });
 });
 
-// Example of a route module
-import routes from './src/routes/routes.js';
-app.use('/api/users', routes);
+// user routes
+import user_routes from './src/routes/users.js';
+app.use('/api/users', user_routes);
+
+// auth routes
+import auth_routes from './src/routes/auth.js';
+app.use('/api/auth', auth_routes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
