@@ -30,7 +30,7 @@ router.post('/register', async (req, res) => {
         // Save the user to the database
         await newUser.save();
 
-        res.json({ message: 'User registered successfully' });
+        res.status(200).json({ message: 'User registered successfully' , user : user});
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal server error' });
@@ -40,8 +40,18 @@ router.post('/register', async (req, res) => {
 // List all users
 router.get('/all',ensureAuthenticated, async (req, res) => {
     try {
-        const users = await User.find();
-        res.json(users);
+        const current_user = await User.findById(req.user._id);
+
+        // if it is admin then every profile is available
+        if(current_user.is_admin){
+            const users = await User.find();
+            res.status(200).json(users);
+        }
+        else{
+            const users = await User.find({ $or: [{ is_private: false }, { _id: req.user._id }] });
+            res.status(200).json(users);
+        }
+        
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal server error' });
@@ -67,7 +77,7 @@ router.put('/edit/', ensureAuthenticated, async (req, res) => {
         if (password) user.password = await bcrypt.hash(password, 10);
 
         await user.save();
-        res.json({ message: 'User profile updated successfully', user });
+        res.status(200).json({ message: 'User profile updated successfully', user });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal server error' });
@@ -80,6 +90,26 @@ router.get('/',ensureAuthenticated, async (req, res) => {
         const id = req.user._id;
         const user = await User.findById(id);
         res.json(user);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// toggle status
+router.put('/toggle/', ensureAuthenticated, async (req, res) => {
+    try {
+        const id = req.user._id;
+        const { photo, name, bio, phone, email, password } = req.body;
+
+        const user = await User.findById(id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        user.is_private = ! user.is_private
+        await user.save();
+        res.status(200).json({ message: 'User profile status toggled successfully', user });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal server error' });
