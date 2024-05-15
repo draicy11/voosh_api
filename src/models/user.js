@@ -33,7 +33,7 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    is_premium_user: {
+    is_private: {
         type: Boolean,
         default: false
     }
